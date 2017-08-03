@@ -82,6 +82,10 @@ func standardizeBtcString(btcString string) string {
 	fractionString := "0"
 	if len(pieces) > 1 {
 		fractionString = pieces[1]
+		fractionLength := len(fractionString)
+		if fractionLength > ethIntFractionLength {
+			fractionString = fractionString[0:btcIntFractionLength]
+		}
 	}
 	fractionLength := utf8.RuneCountInString(fractionString)
 	var fractionBuffer bytes.Buffer

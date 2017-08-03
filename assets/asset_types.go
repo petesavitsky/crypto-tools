@@ -42,6 +42,7 @@ type Ether interface {
 	GetCost(USD) USD
 	Multiply(value int64, percentMultiplier int64) Ether
 	GetFractionLength() int64
+	Compare(Ether) int
 }
 
 type etherStruct struct {

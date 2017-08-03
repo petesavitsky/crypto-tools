@@ -10,8 +10,8 @@ import (
 
 const (
 	ethSizeSeparator        = "."
-	ethStringFractionLength = 6
-	ethIntFractionLength    = 6
+	ethStringFractionLength = 8
+	ethIntFractionLength    = 8
 )
 
 var ethCoinMultiplier = int64(math.Pow10(ethIntFractionLength))
@@ -82,6 +82,10 @@ func standardizeEthString(ethString string) string {
 	fractionString := "0"
 	if len(pieces) > 1 {
 		fractionString = pieces[1]
+		fractionLength := len(fractionString)
+		if fractionLength > ethIntFractionLength {
+			fractionString = fractionString[0:ethIntFractionLength]
+		}
 	}
 	fractionLength := utf8.RuneCountInString(fractionString)
 	var fractionBuffer bytes.Buffer
