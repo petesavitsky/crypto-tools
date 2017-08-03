@@ -16,65 +16,65 @@ const (
 
 var ethCoinMultiplier = int64(math.Pow10(ethIntFractionLength))
 
-func (ethereum ethereumStruct) GetStringValue() string {
-	return ethereum.stringValue
+func (ether etherStruct) GetStringValue() string {
+	return ether.stringValue
 }
 
-func (ethereum ethereumStruct) GetIntValue() int64 {
-	return ethereum.intValue
+func (ether etherStruct) GetIntValue() int64 {
+	return ether.intValue
 }
 
-func (ethereum ethereumStruct) Add(ethereumToAdd Ethereum) Ethereum {
-	satoshis := ethereum.GetIntValue()
-	satoshis += ethereumToAdd.GetIntValue()
-	return NewEthereumFromInt(satoshis)
+func (ether etherStruct) Add(etherToAdd Ether) Ether {
+	satoshis := ether.GetIntValue()
+	satoshis += etherToAdd.GetIntValue()
+	return NewEtherFromInt(satoshis)
 }
 
-func (ethereum ethereumStruct) Subtract(ethereumToSubtract Ethereum) Ethereum {
-	satoshis := ethereum.GetIntValue()
-	satoshis -= ethereumToSubtract.GetIntValue()
-	return NewEthereumFromInt(satoshis)
+func (ether etherStruct) Subtract(etherToSubtract Ether) Ether {
+	satoshis := ether.GetIntValue()
+	satoshis -= etherToSubtract.GetIntValue()
+	return NewEtherFromInt(satoshis)
 }
 
 // Compare sort by amount ascending
-func (ethereum ethereumStruct) Compare(other Ethereum) int {
-	if ethereum.GetIntValue() > other.GetIntValue() {
+func (ether etherStruct) Compare(other Ether) int {
+	if ether.GetIntValue() > other.GetIntValue() {
 		return 1
-	} else if ethereum.GetIntValue() < other.GetIntValue() {
+	} else if ether.GetIntValue() < other.GetIntValue() {
 		return -1
 	}
 	return 0
 }
 
-func (ethereum ethereumStruct) GetCost(price USD) USD {
-	cost := price.GetIntValue() * ethereum.GetIntValue() / ethCoinMultiplier
+func (ether etherStruct) GetCost(price USD) USD {
+	cost := price.GetIntValue() * ether.GetIntValue() / ethCoinMultiplier
 	return NewUSDFromInt(cost)
 }
 
-func (ethereum ethereumStruct) Multiply(value int64, fractionLength int64) Ethereum {
+func (ether etherStruct) Multiply(value int64, fractionLength int64) Ether {
 	percentMultiplier := int64(math.Pow10(int(fractionLength)))
-	return NewEthereumFromInt(ethereum.GetIntValue() * value / percentMultiplier)
+	return NewEtherFromInt(ether.GetIntValue() * value / percentMultiplier)
 }
 
-func (ethereum ethereumStruct) GetFractionLength() int64 {
+func (ether etherStruct) GetFractionLength() int64 {
 	return ethIntFractionLength
 }
 
-//NewEthereumFromString create new ethereum based on string value
-func NewEthereumFromString(ethString string) (Ethereum, error) {
+//NewEtherFromString create new ether based on string value
+func NewEtherFromString(ethString string) (Ether, error) {
 	ethString = standardizeEthString(ethString)
 	ethInt, err := ethStringToInt(ethString)
 	if err != nil {
 		return nil, err
 	}
-	ethereum := ethereumStruct{stringValue: ethString, intValue: ethInt}
-	return ethereum, nil
+	ether := etherStruct{stringValue: ethString, intValue: ethInt}
+	return ether, nil
 }
 
-//NewEthereumFromInt create a new ethereum based on int value
-func NewEthereumFromInt(ethInt int64) Ethereum {
+//NewEtherFromInt create a new ether based on int value
+func NewEtherFromInt(ethInt int64) Ether {
 	ethString := ethIntToString(ethInt)
-	return ethereumStruct{stringValue: ethString, intValue: ethInt}
+	return etherStruct{stringValue: ethString, intValue: ethInt}
 }
 
 func standardizeEthString(ethString string) string {
@@ -98,16 +98,16 @@ func standardizeEthString(ethString string) string {
 
 func ethStringToInt(ethString string) (int64, error) {
 	if len(ethString) < 1 {
-		return 0, ConversionError{message: "Empty string passed for ethereum conversion [" + ethString + "]"}
+		return 0, ConversionError{message: "Empty string passed for ether conversion [" + ethString + "]"}
 	}
 	pieces := strings.Split(ethString, ethSizeSeparator)
 	fraction, err := convertEthFractionStringToInt(pieces[1])
 	if err != nil {
-		return 0, ConversionError{message: "Error converting fraction ethereum [" + pieces[1] + "] for string [" + ethString + "] -- [" + err.Error() + "]"}
+		return 0, ConversionError{message: "Error converting fraction ether [" + pieces[1] + "] for string [" + ethString + "] -- [" + err.Error() + "]"}
 	}
 	wholeCoins, err := convertWholeEthToInt(pieces)
 	if err != nil {
-		return 0, ConversionError{message: "Error converting whole ethereum [" + pieces[0] + "] for string [" + ethString + "] -- [" + err.Error() + "]"}
+		return 0, ConversionError{message: "Error converting whole ether [" + pieces[0] + "] for string [" + ethString + "] -- [" + err.Error() + "]"}
 	}
 	return wholeCoins + fraction, nil
 }

@@ -33,18 +33,18 @@ type usdStruct struct {
 	intValue    int64
 }
 
-// Ethereum  asset type
-type Ethereum interface {
+// Ether  asset type
+type Ether interface {
 	GetStringValue() string
 	GetIntValue() int64
-	Add(Ethereum) Ethereum
-	Subtract(Ethereum) Ethereum
+	Add(Ether) Ether
+	Subtract(Ether) Ether
 	GetCost(USD) USD
-	Multiply(value int64, percentMultiplier int64) Ethereum
+	Multiply(value int64, percentMultiplier int64) Ether
 	GetFractionLength() int64
 }
 
-type ethereumStruct struct {
+type etherStruct struct {
 	stringValue string
 	intValue    int64
 }
