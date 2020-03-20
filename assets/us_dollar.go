@@ -10,12 +10,12 @@ import (
 
 const (
 	usdSizeSeparator             = "."
-	usdStringFractionLength      = 16
-	usdIntFractionLength         = 2
-	usdFractionSignificantDigits = 2
+	usdStringFractionLength int64     = 2
+	usdIntFractionLength int64        = 2
+	usdFractionSignificantDigits int64 = 2
 )
 
-var usdCoinMultiplier = int64(math.Pow10(usdIntFractionLength))
+var usdCoinMultiplier = int64(math.Pow10(int(usdIntFractionLength)))
 
 // Compare compare usd ascending
 func (usd usdStruct) Compare(other USD) int {
@@ -72,8 +72,9 @@ func (usd usdStruct) Subtract(usdToSubtract USD) USD {
 }
 
 func (usd usdStruct) Multiply(value int64, fractionLength int64) USD {
-	percentMultiplier := int64(math.Pow10(int(fractionLength)))
-	usdValue := usd.GetIntValue() * value / percentMultiplier
+	multipliedValue := usd.GetIntValue() * value
+	multipliedFractionLength := usdFractionSignificantDigits + fractionLength
+	usdValue := roundUsd(multipliedValue, multipliedFractionLength, usdFractionSignificantDigits)
 	return NewUSDFromInt(usdValue)
 }
 
@@ -100,12 +101,12 @@ func standardizeUsdString(usdString string) string {
 	fractionString := "0"
 	if len(pieces) > 1 {
 		fractionString = pieces[1]
-		fractionLength := len(fractionString)
+		fractionLength := int64(len(fractionString))
 		if fractionLength > usdIntFractionLength {
 			fractionString = fractionString[0:ethIntFractionLength]
 		}
 	}
-	fractionLength := utf8.RuneCountInString(fractionString)
+	fractionLength := int64(utf8.RuneCountInString(fractionString))
 	var fractionBuffer bytes.Buffer
 	fractionBuffer.WriteString(fractionString)
 	for i := fractionLength; i < usdStringFractionLength; i++ {
@@ -136,7 +137,7 @@ func convertWholeUsdStringToInt(pieces []string) (int64, error) {
 	return int64(dollar), nil
 }
 
-func convertUsdIntToString(usdInt int64, fractionsToPrint int) string {
+func convertUsdIntToString(usdInt int64, fractionsToPrint int64) string {
 	negative := usdInt < 0
 	if negative {
 		usdInt = usdInt * -1
@@ -147,7 +148,7 @@ func convertUsdIntToString(usdInt int64, fractionsToPrint int) string {
 	if fractionUsd < 10 {
 		fractionString = "0" + fractionString
 	}
-	fractionLength := utf8.RuneCountInString(fractionString)
+	fractionLength := int64(utf8.RuneCountInString(fractionString))
 	wholeUsdString := strconv.FormatInt(wholeUsd, 10)
 	var buffer bytes.Buffer
 	if negative {
@@ -163,10 +164,14 @@ func convertUsdIntToString(usdInt int64, fractionsToPrint int) string {
 }
 
 func roundUsdFromStringRepresentation(usdInt int64) int64 {
-	roundingPlace := usdStringFractionLength - usdFractionSignificantDigits
+	return roundUsd(usdInt, usdStringFractionLength, usdFractionSignificantDigits)
+}
+
+func roundUsd(usdInt, fractionLength, significantDigits int64) int64 {
+	roundingPlace := fractionLength - significantDigits
 	significantModulus := int64(10)
 	roundingValueMultiplier := 1
-	for i := 1; i <= roundingPlace; i++ {
+	for i := int64(1); i <= roundingPlace; i++ {
 		currentRoundingValue := usdInt % significantModulus
 		if currentRoundingValue >= int64(roundingValueMultiplier*5) {
 			valueToAdd := significantModulus - currentRoundingValue
@@ -177,6 +182,6 @@ func roundUsdFromStringRepresentation(usdInt int64) int64 {
 		significantModulus = significantModulus * 10
 		roundingValueMultiplier = roundingValueMultiplier * 10
 	}
-	divisor := int64(math.Pow10(roundingPlace))
+	divisor := int64(math.Pow10(int(roundingPlace)))
 	return usdInt / divisor
 }

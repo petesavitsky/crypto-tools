@@ -7,8 +7,9 @@ type Bitcoin interface {
 	Add(Bitcoin) Bitcoin
 	Subtract(Bitcoin) Bitcoin
 	GetCost(USD) USD
-	Multiply(value int64, percentMultiplier int64) Bitcoin
+	Multiply(value int64, fractionDigits int64) Bitcoin
 	GetFractionLength() int64
+	Compare(Bitcoin) int
 }
 
 type bitcoinStruct struct {
@@ -23,7 +24,7 @@ type USD interface {
 	GetIntValue() int64
 	Add(USD) USD
 	Subtract(USD) USD
-	Multiply(value int64, percentMultiplier int64) USD
+	Multiply(value int64, fractionDigits int64) USD
 	Compare(USD) int
 	GetFractionLength() int64
 }
@@ -50,6 +51,7 @@ type etherStruct struct {
 	intValue    int64
 }
 
+// ConversionError error converting
 type ConversionError struct {
 	message string
 }
