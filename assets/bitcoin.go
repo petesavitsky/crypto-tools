@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"math"
 	"strconv"
-	"log"
 	"strings"
 	"unicode/utf8"
 )
