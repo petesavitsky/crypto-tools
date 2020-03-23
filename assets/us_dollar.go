@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	usdSizeSeparator             = "."
-	usdStringFractionLength int64     = 2
-	usdIntFractionLength int64        = 2
+	usdSizeSeparator                   = "."
+	usdStringFractionLength      int64 = 2
+	usdIntFractionLength         int64 = 2
 	usdFractionSignificantDigits int64 = 2
 )
 
