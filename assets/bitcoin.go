@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"math"
 	"strconv"
+	"log"
 	"strings"
 	"unicode/utf8"
 )
@@ -58,6 +59,14 @@ func (bitcoin bitcoinStruct) Compare(other Bitcoin) int {
 		return -1
 	}
 	return 0
+}
+
+func (bitcoin bitcoinStruct) GetUnitCostAtPrice(price USD) USD {
+	ratio := float64(price.GetIntValue()) / float64(bitcoin.intValue)
+	multiplier := math.Pow10(int(btcIntFractionLength))
+	unitCostFloat := ratio * multiplier
+	unitCostInt := int64(math.Round(unitCostFloat))
+	return NewUSDFromInt(unitCostInt)
 }
 
 //NewBitcoinFromString create new bitcoin based on string value

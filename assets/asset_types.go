@@ -10,6 +10,7 @@ type Bitcoin interface {
 	Multiply(value int64, fractionDigits int64) Bitcoin
 	GetFractionLength() int64
 	Compare(Bitcoin) int
+	GetUnitCostAtPrice(USD) USD
 }
 
 type bitcoinStruct struct {
