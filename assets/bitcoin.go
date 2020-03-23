@@ -145,6 +145,10 @@ func convertWholeBtcToInt(pieces []string) (int64, error) {
 }
 
 func btcIntToString(btcInt int64) string {
+	isNegative := btcInt < 0
+	if isNegative {
+		btcInt = -1 * btcInt
+	}
 	wholeBtc := btcInt / int64(btcCoinMultiplier)
 	fractionBtc := btcInt % int64(btcCoinMultiplier)
 	fractionString := strconv.FormatInt(fractionBtc, 10)
@@ -154,5 +158,8 @@ func btcIntToString(btcInt int64) string {
 		buffer.WriteString("0")
 	}
 	btcString := strconv.FormatInt(wholeBtc, 10) + btcSizeSeparator + buffer.String() + fractionString
+	if isNegative {
+		btcString = "-" + btcString
+	}
 	return btcString
 }
