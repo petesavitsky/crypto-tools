@@ -22,3 +22,14 @@ func TestMultiply(t *testing.T) {
     t.Log("Dollars are equal!")
   }
 }
+
+func TestNegative(t *testing.T) {
+  dollars, err := NewUSDFromString("-34.50")
+  if err != nil {
+    t.Errorf("couldn't parse negative %s", dollars.GetStringValue())
+  }
+  negDollars := NewUSDFromInt(-1000)
+  if "-10.00" != negDollars.GetStringValue() {
+    t.Errorf("Invalid negative string value %s", negDollars.GetStringValue())
+  }
+}

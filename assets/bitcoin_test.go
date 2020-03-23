@@ -13,3 +13,14 @@ func TestBitcoin(t *testing.T) {
     t.Errorf("Failure. Expected %s but got %s", expectedUnitCost.GetStringValue(), actualUnitCost.GetStringValue())
   }
 }
+
+func TestNegativeBitcoin(t *testing.T) {
+  btc, err := NewBitcoinFromString("-1.00")
+  if err != nil {
+    t.Error(err)
+  }
+  if btc.GetStringValue() != "-1.00000000" {
+    t.Errorf("Invalid btc string value returned %s", btc.GetStringValue())
+  }
+
+}
