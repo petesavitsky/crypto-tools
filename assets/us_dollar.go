@@ -10,12 +10,12 @@ import (
 
 const (
 	usdSizeSeparator                   = "."
-	usdStringFractionLength      int64 = 2
-	usdIntFractionLength         int64 = 2
-	usdFractionSignificantDigits int64 = 2
+	defaultUsdStringFractionLength      int64 = 2
+	defaultUsdIntFractionLength         int64 = 2
+	defaultUsdFractionSignificantDigits int64 = 2
 )
 
-var usdCoinMultiplier = int64(math.Pow10(int(usdIntFractionLength)))
+var defaultUsdCoinMultiplier = int64(math.Pow10(int(defaultUsdIntFractionLength)))
 
 // Compare compare usd ascending
 func (usd usdStruct) Compare(other USD) int {
@@ -28,7 +28,7 @@ func (usd usdStruct) Compare(other USD) int {
 }
 
 func (usd usdStruct) GetFractionLength() int64 {
-	return usdIntFractionLength
+	return usd.usdIntFractionLength
 }
 
 // NewUSDFromString create USD from string
@@ -38,13 +38,27 @@ func NewUSDFromString(usdString string) (USD, error) {
 	if err != nil {
 		return nil, err
 	}
-	return usdStruct{stringValue: usdString, intValue: usdInt}, nil
+	return usdStruct{stringValue: usdString, intValue: usdInt,
+		usdStringFractionLength: defaultUsdStringFractionLength,
+		usdIntFractionLength: defaultUsdIntFractionLength,
+		usdFractionSignificantDigits: defaultUsdFractionSignificantDigits}, nil
 }
 
 // NewUSDFromInt create USD from int value
 func NewUSDFromInt(usdInt int64) USD {
-	usdString := convertUsdIntToString(usdInt, usdStringFractionLength)
-	return usdStruct{stringValue: usdString, intValue: usdInt}
+	usdString := convertUsdIntToString(usdInt, defaultUsdStringFractionLength)
+	return usdStruct{stringValue: usdString, intValue: usdInt,
+		usdStringFractionLength: defaultUsdStringFractionLength,
+		usdIntFractionLength: defaultUsdIntFractionLength,
+		usdFractionSignificantDigits: defaultUsdFractionSignificantDigits}
+}
+
+func NewUSDFromIntCustomFractionLength(usdInt, stringFractionLength int64) USD {
+	usdString := convertUsdIntToString(usdInt, stringFractionLength)
+	return usdStruct{stringValue: usdString, intValue: usdInt,
+		usdStringFractionLength: stringFractionLength,
+		usdIntFractionLength: stringFractionLength,
+		usdFractionSignificantDigits: stringFractionLength}
 }
 
 func (usd usdStruct) GetStringValue() string {
@@ -52,7 +66,7 @@ func (usd usdStruct) GetStringValue() string {
 }
 
 func (usd usdStruct) GetPrettyStringValue() string {
-	return convertUsdIntToString(usd.intValue, usdIntFractionLength)
+	return convertUsdIntToString(usd.intValue, usd.usdIntFractionLength)
 }
 
 func (usd usdStruct) GetIntValue() int64 {
@@ -73,8 +87,8 @@ func (usd usdStruct) Subtract(usdToSubtract USD) USD {
 
 func (usd usdStruct) Multiply(value int64, fractionLength int64) USD {
 	multipliedValue := usd.GetIntValue() * value
-	multipliedFractionLength := usdFractionSignificantDigits + fractionLength
-	usdValue := roundUsd(multipliedValue, multipliedFractionLength, usdFractionSignificantDigits)
+	multipliedFractionLength := usd.usdFractionSignificantDigits + fractionLength
+	usdValue := roundUsd(multipliedValue, multipliedFractionLength, usd.usdFractionSignificantDigits)
 	return NewUSDFromInt(usdValue)
 }
 
@@ -102,14 +116,14 @@ func standardizeUsdString(usdString string) string {
 	if len(pieces) > 1 {
 		fractionString = pieces[1]
 		fractionLength := int64(len(fractionString))
-		if fractionLength > usdIntFractionLength {
-			fractionString = fractionString[0:ethIntFractionLength]
+		if fractionLength > defaultUsdIntFractionLength {
+			fractionString = fractionString[0:defaultUsdIntFractionLength]
 		}
 	}
 	fractionLength := int64(utf8.RuneCountInString(fractionString))
 	var fractionBuffer bytes.Buffer
 	fractionBuffer.WriteString(fractionString)
-	for i := fractionLength; i < usdStringFractionLength; i++ {
+	for i := fractionLength; i < defaultUsdStringFractionLength; i++ {
 		fractionBuffer.WriteString("0")
 	}
 	var standardizedBuffer bytes.Buffer
@@ -133,8 +147,12 @@ func convertWholeUsdStringToInt(pieces []string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	dollar = dollar * int(usdCoinMultiplier)
+	dollar = dollar * getUsdCoinMultiplier(defaultUsdIntFractionLength)
 	return int64(dollar), nil
+}
+
+func getUsdCoinMultiplier(fractionLength int64) int {
+	return int(math.Pow10(int(fractionLength)))
 }
 
 func convertUsdIntToString(usdInt int64, fractionsToPrint int64) string {
@@ -142,8 +160,8 @@ func convertUsdIntToString(usdInt int64, fractionsToPrint int64) string {
 	if negative {
 		usdInt = usdInt * -1
 	}
-	wholeUsd := usdInt / usdCoinMultiplier
-	fractionUsd := usdInt % usdCoinMultiplier
+	wholeUsd := usdInt / int64(getUsdCoinMultiplier(defaultUsdCoinMultiplier))
+	fractionUsd := usdInt % int64(getUsdCoinMultiplier(defaultUsdCoinMultiplier))
 	fractionString := strconv.FormatInt(fractionUsd, 10)
 	if fractionUsd < 10 {
 		fractionString = "0" + fractionString
@@ -164,7 +182,7 @@ func convertUsdIntToString(usdInt int64, fractionsToPrint int64) string {
 }
 
 func roundUsdFromStringRepresentation(usdInt int64) int64 {
-	return roundUsd(usdInt, usdStringFractionLength, usdFractionSignificantDigits)
+	return roundUsd(usdInt, defaultUsdStringFractionLength, defaultUsdFractionSignificantDigits)
 }
 
 func roundUsd(usdInt, fractionLength, significantDigits int64) int64 {

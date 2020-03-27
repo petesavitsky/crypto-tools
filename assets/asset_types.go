@@ -33,6 +33,9 @@ type USD interface {
 type usdStruct struct {
 	stringValue string
 	intValue    int64
+	usdStringFractionLength      int64
+	usdIntFractionLength         int64
+	usdFractionSignificantDigits int64
 }
 
 // Ether  asset type
