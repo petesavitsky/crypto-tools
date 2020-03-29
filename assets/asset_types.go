@@ -13,6 +13,17 @@ type Bitcoin interface {
 	GetUnitCostAtPrice(USD) USD
 }
 
+// Asset an asset
+type Asset interface {
+	GetIntValue() int64
+	GetFractionLength() int64
+}
+
+type assetStruct struct {
+	value int64
+	fractionLength int64
+}
+
 type bitcoinStruct struct {
 	stringValue string
 	intValue    int64
