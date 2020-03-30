@@ -13,7 +13,7 @@ func DivideByAsset(dividend Asset, divisor Asset, outputFractionDecimalLength in
 
 func Divide(dividend Asset, divisor, outputFractionDecimalLength int64) Asset {
   ratio := float64(dividend.GetIntValue()) / float64(divisor)
-  multiplierPower := dividend.GetFractionLength() + outputFractionDecimalLength
+  multiplierPower := outputFractionDecimalLength - dividend.GetFractionLength()
   multiplier := math.Pow10(int(multiplierPower))
   resultFloat := math.Round(ratio * multiplier)
   resultInt := int64(resultFloat)
