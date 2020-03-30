@@ -2,9 +2,18 @@ package assets
 
 import "math"
 
-func Divide(dividend Asset, divisor Asset, outputFractionDecimalLength int64) Asset {
+func DivideByAsset(dividend Asset, divisor Asset, outputFractionDecimalLength int64) Asset {
   ratio := float64(dividend.GetIntValue()) / float64(divisor.GetIntValue())
   multiplierPower := (divisor.GetFractionLength() - dividend.GetFractionLength()) + outputFractionDecimalLength
+  multiplier := math.Pow10(int(multiplierPower))
+  resultFloat := math.Round(ratio * multiplier)
+  resultInt := int64(resultFloat)
+  return assetStruct{value: resultInt, fractionLength: outputFractionDecimalLength}
+}
+
+func Divide(dividend Asset, divisor, outputFractionDecimalLength int64) Asset {
+  ratio := float64(dividend.GetIntValue()) / float64(divisor)
+  multiplierPower := dividend.GetFractionLength() + outputFractionDecimalLength
   multiplier := math.Pow10(int(multiplierPower))
   resultFloat := math.Round(ratio * multiplier)
   resultInt := int64(resultFloat)
