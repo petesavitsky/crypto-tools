@@ -5,6 +5,12 @@ import (
 )
 
 func TestMultiply(t *testing.T) {
+	dollarsUno, err := NewUSDFromString("0.00307472")
+	if err != nil {
+		t.Errorf("Error parsing dollars uno %v", err)
+		return
+	}
+	t.Logf("Uno - %s -- int %d -- frac %d", dollarsUno.GetStringValue(), dollarsUno.GetIntValue(), dollarsUno.GetFractionLength())
 	dollarsOne, err := NewUSDFromString("18755.77")
 	if err != nil {
 		t.Errorf("Error parsing dollars one %v", err)

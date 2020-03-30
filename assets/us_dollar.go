@@ -101,10 +101,6 @@ func standardizeUsdString(usdString string) string {
 	fractionString := "0"
 	if len(pieces) > 1 {
 		fractionString = pieces[1]
-		fractionLength := int64(len(fractionString))
-		if fractionLength > usdIntFractionLength {
-			fractionString = fractionString[0:ethIntFractionLength]
-		}
 	}
 	fractionLength := int64(utf8.RuneCountInString(fractionString))
 	var fractionBuffer bytes.Buffer
@@ -125,7 +121,7 @@ func convertUsdFractionStringToInt(fractionString string) (int64, error) {
 		return 0, err
 	}
 	unrounded := int64(fraction)
-	return roundUsdFromStringRepresentation(unrounded), nil
+	return roundUsdFromStringRepresentation(unrounded, len(fractionString)), nil
 }
 
 func convertWholeUsdStringToInt(pieces []string) (int64, error) {
@@ -163,8 +159,8 @@ func convertUsdIntToString(usdInt int64, fractionsToPrint int64) string {
 	return buffer.String()
 }
 
-func roundUsdFromStringRepresentation(usdInt int64) int64 {
-	return roundUsd(usdInt, usdStringFractionLength, usdFractionSignificantDigits)
+func roundUsdFromStringRepresentation(usdInt int64, fractionLength int) int64 {
+	return roundUsd(usdInt, int64(fractionLength), usdFractionSignificantDigits)
 }
 
 func roundUsd(usdInt, fractionLength, significantDigits int64) int64 {

@@ -90,10 +90,6 @@ func standardizeBtcString(btcString string) string {
 	fractionString := "0"
 	if len(pieces) > 1 {
 		fractionString = pieces[1]
-		fractionLength := len(fractionString)
-		if fractionLength > ethIntFractionLength {
-			fractionString = fractionString[0:btcIntFractionLength]
-		}
 	}
 	fractionLength := utf8.RuneCountInString(fractionString)
 	var fractionBuffer bytes.Buffer
@@ -130,7 +126,7 @@ func convertBtcFractionStringToInt(fractionString string) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return int64(fraction), nil
+	return roundBitcoinFromStringRepresentation(int64(fraction), len(fractionString)), nil
 }
 
 func convertWholeBtcToInt(pieces []string) (int64, error) {
@@ -162,4 +158,27 @@ func btcIntToString(btcInt int64) string {
 		btcString = "-" + btcString
 	}
 	return btcString
+}
+
+func roundBitcoinFromStringRepresentation(btcInt int64, fractionLength int) int64 {
+	return roundBitcoin(btcInt, int64(fractionLength), btcIntFractionLength)
+}
+
+func roundBitcoin(btcInt, fractionLength, significantDigits int64) int64 {
+	roundingPlace := fractionLength - significantDigits
+	significantModulus := int64(10)
+	roundingValueMultiplier := 1
+	for i := int64(1); i <= roundingPlace; i++ {
+		currentRoundingValue := btcInt % significantModulus
+		if currentRoundingValue >= int64(roundingValueMultiplier*5) {
+			valueToAdd := significantModulus - currentRoundingValue
+			btcInt += valueToAdd
+		} else {
+			btcInt -= currentRoundingValue
+		}
+		significantModulus = significantModulus * 10
+		roundingValueMultiplier = roundingValueMultiplier * 10
+	}
+	divisor := int64(math.Pow10(int(roundingPlace)))
+	return btcInt / divisor
 }
