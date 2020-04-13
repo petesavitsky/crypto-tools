@@ -79,6 +79,11 @@ func NewBitcoinFromString(btcString string) (Bitcoin, error) {
 	return bitcoin, nil
 }
 
+// ZeroBitcoin returns a bitcoin with value zero
+func ZeroBitcoin() Bitcoin {
+	return NewBitcoinFromInt(0)
+}
+
 //NewBitcoinFromInt create a new bitcoin based on int value
 func NewBitcoinFromInt(btcInt int64) Bitcoin {
 	btcString := btcIntToString(btcInt)

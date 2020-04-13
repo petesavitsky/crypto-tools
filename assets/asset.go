@@ -2,6 +2,7 @@ package assets
 
 import "math"
 
+// DivideByAsset divides an asset by another, outputing in the specified fraction decimal length
 func DivideByAsset(dividend Asset, divisor Asset, outputFractionDecimalLength int64) Asset {
   ratio := float64(dividend.GetIntValue()) / float64(divisor.GetIntValue())
   multiplierPower := (divisor.GetFractionLength() - dividend.GetFractionLength()) + outputFractionDecimalLength
@@ -11,6 +12,7 @@ func DivideByAsset(dividend Asset, divisor Asset, outputFractionDecimalLength in
   return assetStruct{value: resultInt, fractionLength: outputFractionDecimalLength}
 }
 
+// Divide divids an assent by an int, outputs an asset with the specified fraction decimal length
 func Divide(dividend Asset, divisor, outputFractionDecimalLength int64) Asset {
   ratio := float64(dividend.GetIntValue()) / float64(divisor)
   multiplierPower := outputFractionDecimalLength - dividend.GetFractionLength()
